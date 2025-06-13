@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaStar, FaUser } from 'react-icons/fa';
 import '../styles/Reviews.css';
 
-const API_BASE_URL = import.meta.env.DEV ? '' : '/api';
+const API_BASE_URL = import.meta.env.DEV ? '' : import.meta.env.VITE_API_URL;
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
