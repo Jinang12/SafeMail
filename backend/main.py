@@ -453,6 +453,14 @@ async def get_latest_reviews():
         reviews.append(document)
     return reviews
 
+@app.get("/")
+async def read_root_health_check():
+    return {"status": "Backend service is running", "version": "1.0"}
+
+@app.get("/api")
+async def read_api_root():
+    return {"message": "Welcome to the SafeMail API!"}
+
 if __name__ == "__main__":
     import uvicorn
     # Run on all network interfaces (0.0.0.0) to allow mobile access
