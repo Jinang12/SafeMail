@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield shape -->
+  <path d="M16 2L4 6V14C4 20.6274 9.37258 26 16 26C22.6274 26 28 20.6274 28 14V6L16 2Z" 
+        fill="none" 
+        stroke="#39FF14" 
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Shield inner details -->
+  <path d="M16 6V22" 
+        stroke="#39FF14" 
+        stroke-width="2"
+        stroke-linecap="round"/>
+  
+  <!-- Shield checkmark -->
+  <path d="M12 14L14 16L20 10" 
+        stroke="#39FF14" 
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Glow effect -->
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+    <feMerge>
+      <feMergeNode in="coloredBlur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+  
+  <!-- Apply glow to all paths -->
+  <g filter="url(#glow)">
+    <path d="M16 2L4 6V14C4 20.6274 9.37258 26 16 26C22.6274 26 28 20.6274 28 14V6L16 2Z" 
+          fill="none" 
+          stroke="#39FF14" 
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    <path d="M16 6V22" 
+          stroke="#39FF14" 
+          stroke-width="2"
+          stroke-linecap="round"/>
+    <path d="M12 14L14 16L20 10" 
+          stroke="#39FF14" 
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+  </g>
+</svg> 

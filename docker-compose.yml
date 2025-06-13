@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    # environment:
+    #   - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/safesms
+      - MODEL_PATH=/app/sms_spam_model.pkl
+      - VECTORIZER_PATH=/app/sms_vectorizer.pkl
+    volumes:
+      - ./backend:/app
+      - ./backend/sms_spam_model.pkl:/app/sms_spam_model.pkl
+      - ./backend/sms_vectorizer.pkl:/app/sms_vectorizer.pkl
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=safesms
+
+volumes:
+  mongodb_data: 

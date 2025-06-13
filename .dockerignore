@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+build
+.git
+.gitignore
+.env
+*.pyc
+__pycache__
+.pytest_cache
+.coverage
+htmlcov
+dist
+.DS_Store 
