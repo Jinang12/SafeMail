@@ -5,9 +5,12 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: MONGODB_URI
+      - key: MONGODB_URL
+        value: mongodb+srv://jinang:helloworld@cluster0.sockwk5.mongodb.net/safesms?retryWrites=true&w=majority&appName=Cluster0
         sync: false
       - key: CORS_ORIGINS
-        value: https://safemail.vercel.app
+        value: https://safemail.vercel.app,http://localhost:5173,http://localhost:3000
       - key: PYTHON_VERSION
-        value: 3.9.0 
+        value: 3.9.0
+      - key: PORT
+        value: 8000 

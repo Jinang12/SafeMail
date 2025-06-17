@@ -15,7 +15,6 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Add smooth scroll behavior to the entire page */
 html {
   scroll-behavior: smooth;
 }
@@ -91,7 +90,7 @@ html {
 
 .main-content {
   flex: 1;
-  padding-top: 100px; /* Increased top margin to prevent navbar overlap */
+  padding-top: 100px;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -109,7 +108,6 @@ html {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .app-header {
     padding: 1rem;
@@ -136,7 +134,7 @@ html {
   }
 
   .main-content {
-    padding-top: 90px; /* Adjusted for mobile */
+    padding-top: 90px;
   }
 }
 

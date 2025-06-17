@@ -1,0 +1,234 @@
+%-------------------------
+% Resume in Latex
+% Author: Jinang Shah
+% License : MIT
+%------------------------
+
+\documentclass[a4paper,11pt]{article}
+
+%---- Required Packages ----
+\usepackage{latexsym}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{ragged2e}
+\usepackage[empty]{fullpage}
+\usepackage{wrapfig}
+\usepackage{lipsum}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{geometry}
+\usepackage{marvosym}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{cfr-lm}
+\usepackage[T1]{fontenc}
+\usepackage[most]{tcolorbox}
+
+%---- Page Setup ----
+\setlength{\multicolsep}{0pt} 
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\geometry{left=1.4cm, top=0.8cm, right=1.2cm, bottom=1cm}
+
+%---- Color Box Setup ----
+\tcbset{
+    frame code={}
+    center title,
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt,
+    colback=gray!20,
+    colframe=white,
+    width=\dimexpr\textwidth\relax,
+    enlarge left by=-2mm,
+    boxsep=4pt,
+    arc=0pt,outer arc=0pt,
+}
+
+\urlstyle{same}
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+%---- Section Formatting ----
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-7pt}]
+
+%---- Custom Commands ----
+\newcommand{\resumeItem}[2]{
+  \item{
+    \textbf{#1}{\hspace{0.5mm}#2 \vspace{-0.5mm}}
+  }
+}
+
+\newcommand{\resumePOR}[3]{
+\vspace{0.5mm}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textbf{#1}\hspace{0.3mm}#2 & \textit{\small{#3}} 
+    \end{tabular*}
+    \vspace{-2mm}
+}
+
+\newcommand{\resumeSubheading}[4]{
+\vspace{0.5mm}\item
+    \begin{tabular*}{0.98\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textbf{#1} & \textit{\footnotesize{#4}} \\
+        \textit{\footnotesize{#3}} &  \footnotesize{#2}\\
+    \end{tabular*}
+    \vspace{-2.4mm}
+}
+
+\newcommand{\resumeProject}[4]{
+\vspace{0.5mm}\item
+    \begin{tabular*}{0.98\textwidth}[t]{l@{\extracolsep{\fill}}r}
+        \textbf{#1} & \textit{\footnotesize{#3}} \\
+        \footnotesize{\textit{#2}} & \footnotesize{#4}
+    \end{tabular*}
+    \vspace{-2.4mm}
+}
+
+\newcommand{\resumeSubItem}[2]{\resumeItem{#1}{#2}\vspace{-4pt}}
+\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=*,labelsep=0mm]}
+\newcommand{\resumeHeadingSkillStart}{\begin{itemize}[leftmargin=*,itemsep=1.7mm, rightmargin=2ex]}
+\newcommand{\resumeItemListStart}{\begin{justify}\begin{itemize}[leftmargin=3ex, rightmargin=2ex, noitemsep,labelsep=1.2mm,itemsep=0mm]\small}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}\vspace{2mm}}
+\newcommand{\resumeHeadingSkillEnd}{\end{itemize}\vspace{-2mm}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\end{justify}\vspace{-2mm}}
+\newcommand{\cvsection}[1]{%
+\vspace{2mm}
+\begin{tcolorbox}
+    \textbf{\large #1}
+\end{tcolorbox}
+    \vspace{-4mm}
+}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}%
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}%
+\newcolumntype{C}{>{\centering\arraybackslash}X}%
+
+%---- Resume Content ----
+\begin{document}
+\fontfamily{cmr}\selectfont
+
+%----------HEADING----------
+{
+\begin{tabularx}{\linewidth}{L r} \\
+  \textbf{\Large Jinang Shah} & {\raisebox{0.0\height}{\footnotesize \faPhone}\ +91-7021098200}\\
+  {Computer Science and Engineering Student} & \href{mailto:shahjinang1109@gmail.com}{\raisebox{0.0\height}{\footnotesize \faEnvelope}\ {shahjinang1109@gmail.com}} \\
+  {Dwarkadas J Sanghvi College of Engineering, Mumbai} & \href{https://github.com/Jinang12}{\raisebox{0.0\height}{\footnotesize \faGithub}\ {Jinang12}} \\  
+  {Specializing in IoT, Cybersecurity, and Blockchain} & \href{https://www.linkedin.com/in/jinang-shah-9292082b6//}{\raisebox{0.0\height}{\footnotesize \faLinkedin}\ {Jinang}}
+\end{tabularx}
+}
+\vspace{-1pt}
+
+%-----------EDUCATION-----------
+\section{\textbf{Education}}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Bachelor of Technology in Computer Science and Engineering}{CGPA: 8.9/10.0}
+      {Dwarkadas J Sanghvi College of Engineering, Mumbai}{2023-27}
+      \resumeItemListStart
+        \item {Specialization: IoT, Cybersecurity, and Blockchain Technology}
+        \item {Key Coursework: Data Structures \& Algorithms, Operating Systems, Object-Oriented Programming, Database Management Systems}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+\vspace{-3pt}
+
+%-----------TECHNICAL SKILLS-----------
+\section{\textbf{Technical Skills}}
+\begin{itemize}[leftmargin=0.05in, label={}]
+    \small{\item{
+    \textbf{Programming Languages}{: Java, Python, C, JavaScript} \\
+    \textbf{Web Development}{: React.js, Node.js, Express.js, HTML5, CSS3, Bootstrap, Tailwind CSS, FastAPI} \\
+    \textbf{Databases}{: MongoDB, MySQL, Firebase} \\
+    \textbf{Development Tools}{: Git, GitHub, VS Code, Postman, Vercel, Firebase, Docker} \\
+    \textbf{Problem Solving}{: Data Structures, Algorithms, Competitive Programming} \\
+    \textbf{Machine Learning}{: scikit-learn, TF-IDF Vectorization, Model Deployment} \\
+    }}
+\end{itemize}
+\vspace{-3pt}
+
+%-----------PROJECTS-----------------
+\section{\textbf{Projects}}
+\resumeSubHeadingListStart
+    \resumeProject
+      {SafeMail} %Project Name
+      {AI-powered SMS security scanner using machine learning for spam detection with 95\% accuracy.} %Project Description
+      {\href{https://github.com/Jinang12/SafeMail}{Project Link}} %Live Demo Link
+
+      \resumeItemListStart
+        \item {Engineered full-stack application integrating machine learning model for real-time SMS analysis with 95\% accuracy}
+        \item {Architected secure API endpoints using FastAPI and MongoDB for data persistence, handling 100+ concurrent requests}
+        \item {Crafted responsive UI with React and Tailwind CSS, achieving a 90\% user satisfaction in usability testing}
+        \item {Technology Stack: Python, FastAPI, React, MongoDB, scikit-learn, Docker, Tailwind CSS}
+    \resumeItemListEnd
+    \vspace{-1.5mm}
+    
+    \resumeProject
+      {MemeX} %Project Name
+      {Interactive meme generator platform with 20+ customizable templates and 500+ user-generated memes.} %Project Description
+      {\href{https://meme-x-lyart.vercel.app}{Project Link}} %Live Demo Link
+
+      \resumeItemListStart
+        \item {Created an intuitive meme generator with 20+ customizable templates, enabling users to create memes in under 30 seconds}
+        \item {Optimized image processing pipeline reducing load time by 35\% and boosting user engagement by 45\%}
+        \item {Technology Stack: React, Vite, Tailwind, Bootstrap, Shadcn}
+    \resumeItemListEnd
+    \vspace{-1.5mm}
+    
+    \resumeProject
+      {Eclora} 
+      {Full-stack e-commerce platform in development, implementing core features with MERN stack.} 
+      {} 
+
+      \resumeItemListStart
+        \item {Designed and implemented scalable architecture with MongoDB for product management and user authentication}
+        \item {Architected secure payment integration using Stripe API with comprehensive error handling and transaction logging}
+        \item {Technology Stack: MERN Stack, Tailwind CSS, Redux for state management}
+      \resumeItemListEnd
+
+    \vspace{-1.5mm}
+
+\resumeSubHeadingListEnd
+\vspace{-3pt}
+
+%-----------EXPERIENCE-----------------
+\section{\textbf{Experience}}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Technical Co-Committee Member}{Mumbai, India}
+      {DJS NSDC (National Student Data Corps)}{2024 - Present}
+      \vspace{-1.5mm}
+      \resumeItemListStart
+        \item {Led technical workshops on web development and DSA for 25+ students, achieving 90\% satisfaction rate and 35\% improvement in coding skills}
+        \item {Organized 3 competitive programming contests with 50+ participants, resulting in 25\% increase in department's competitive programming participation}
+        \item {Mentored 10+ junior students in DSA and web development, with 80\% reporting significant skill improvement and successful project completions}
+    \resumeItemListEnd
+  \resumeSubHeadingListEnd
+\vspace{-3pt}
+
+%-----------ACHIEVEMENTS-----------------
+\section{\textbf{Achievements}}
+\resumeSubHeadingListStart
+    \resumePOR{Competitive Programming Excellence}
+        {Codeforces Rating: 1029; LeetCode: 142 Problems Solved}
+        {2023-Present}
+    \resumePOR{Technical Project Recognition}
+        {MemeX project received 90\% positive user feedback with 25+ daily active users}
+        {2024}
+    \resumePOR{Academic Excellence}
+        {Maintained CGPA of 8.9/10.0 and ranked in top 15\% of department}
+        {2023-Present}
+\resumeSubHeadingListEnd
+
+\end{document} 

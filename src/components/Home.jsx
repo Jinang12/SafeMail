@@ -20,9 +20,6 @@ export default function Home() {
             <li>Spam messages</li>
             <li>Suspicious attachments</li>
           </ul>
-          <p className="terminal-text">
-            Interact with the 3D model to explore our security features.
-          </p>
         </div>
         <div className="scene-wrapper">
           <Scene3D />

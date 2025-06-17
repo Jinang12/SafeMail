@@ -14,29 +14,20 @@ import hashlib
 import logging
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
+import pickle
 
-# Set up logging with correct path
-log_dir = os.path.dirname(__file__)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(log_dir, 'email_analysis.log')),
-        logging.StreamHandler()
-    ]
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
 load_dotenv()
 
 app = FastAPI(title="SafeMail API")
 
-# CORS configuration
 origins = [
     "http://localhost:3000",
     "http://localhost:5173",
-    "https://safemail.vercel.app",  # Add your Vercel frontend URL
+    "http://127.0.0.1:5173",
+    "https://safemail.vercel.app",
 ]
 
 app.add_middleware(
@@ -47,33 +38,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define paths
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'model')
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 DATASET_DIR = os.path.join(os.path.dirname(__file__), 'dataset')
 
-# Create necessary directories
 os.makedirs(MODEL_DIR, exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(DATASET_DIR, exist_ok=True)
 
-# Define file paths
 TRAINING_DATA_FILE = os.path.join(DATA_DIR, 'spam_Emails_data.csv')
 DATASET_FILE = os.path.join(DATASET_DIR, 'analyzed_emails.csv')
 
-# MongoDB connection
-MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-client = AsyncIOMotorClient(MONGODB_URI)
+MONGODB_URL = "mongodb+srv://jinang:helloworld@cluster0.sockwk5.mongodb.net/safesms?retryWrites=true&w=majority&appName=Cluster0"
+client = AsyncIOMotorClient(MONGODB_URL)
 db = client.safesms
 reviews_collection = db.reviews
 
-# Load the ML model and vectorizer
+model_path = os.path.join(os.path.dirname(__file__), 'model', 'spam_model.pkl')
+vectorizer_path = os.path.join(os.path.dirname(__file__), 'model', 'tfidf_vectorizer.pkl')
+
 try:
-    model = joblib.load(os.path.join(MODEL_DIR, 'spam_model.pkl'))
-    vectorizer = joblib.load(os.path.join(MODEL_DIR, 'tfidf_vectorizer.pkl'))
-    logger.info("Model and vectorizer loaded successfully")
+    model = joblib.load(model_path)
+    vectorizer = joblib.load(vectorizer_path)
+    test_text = "This is a test message"
+    test_vector = vectorizer.transform([test_text])
+    test_prediction = model.predict(test_vector)
 except Exception as e:
-    logger.error(f"Error loading model: {e}")
+    logger.error(f"Error loading model: {str(e)}")
     model = None
     vectorizer = None
 
@@ -248,61 +239,36 @@ def save_to_analysis_dataset(email_content: str, result: dict) -> bool:
         return False
 
 def analyze_email(content: str) -> dict:
-    """
-    Analyze email content using the ML model
-    """
-    if model is None or vectorizer is None:
+    if not model or not vectorizer:
         raise HTTPException(status_code=500, detail="Model not loaded")
-
-    try:
-        # Transform the input email
-        features = vectorizer.transform([content])
-        
-        # Get prediction and probability
-        prediction = model.predict(features)[0]
-        probabilities = model.predict_proba(features)[0]
-        confidence = float(max(probabilities) * 100)
-
-        # Determine if email is safe (1 is safe, 0 is spam)
-        is_safe = bool(prediction == 1)
-
-        # Generate analysis and threats
-        analysis, threats = generate_analysis(content, is_safe, confidence)
-
-        result = {
-            "is_safe": is_safe,
-            "confidence": confidence,
-            "threats": threats,
-            "analysis": analysis
-        }
-
-        # Save to both datasets if not duplicates
-        training_saved = save_to_training_dataset(content, is_safe)
-        analysis_saved = save_to_analysis_dataset(content, result)
-
-        logger.info(f"Save results - Training: {'Success' if training_saved else 'Failed'}, Analysis: {'Success' if analysis_saved else 'Failed'}")
-
-        return result
-    except Exception as e:
-        logger.error(f"Error in analyze_email: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    
+    vector = vectorizer.transform([content])
+    prediction = model.predict(vector)[0]
+    probability = model.predict_proba(vector)[0]
+    confidence = float(max(probability))
+    
+    is_safe = prediction == 0
+    threats, analysis = generate_analysis(content, is_safe, confidence)
+    
+    return {
+        "is_safe": is_safe,
+        "confidence": confidence,
+        "threats": threats,
+        "analysis": analysis
+    }
 
 def generate_analysis(content: str, is_safe: bool, confidence: float) -> tuple:
-    """
-    Generate analysis and threats based on model prediction
-    """
-    if is_safe:
-        analysis = f"This email appears to be safe (Ham) with {confidence:.1f}% confidence. No suspicious patterns detected."
-        threats = []
-    else:
-        analysis = f"Potential spam detected with {confidence:.1f}% confidence."
-        threats = [
-            "Suspicious content patterns detected",
-            "Potential spam characteristics identified",
-            "High risk of unwanted or malicious content"
-        ]
+    threats = []
+    if not is_safe:
+        if "urgent" in content.lower():
+            threats.append("Urgency tactics detected")
+        if "password" in content.lower():
+            threats.append("Password request detected")
+        if "click here" in content.lower():
+            threats.append("Suspicious link detected")
     
-    return analysis, threats
+    analysis = "Safe" if is_safe else "Potentially harmful"
+    return threats, analysis
 
 def preprocess_sms(text):
     # Convert to lowercase
@@ -317,131 +283,120 @@ def preprocess_sms(text):
     return text
 
 def analyze_sms_content(text):
-    # Preprocess the text
-    processed_text = preprocess_sms(text)
-    
-    # Vectorize the text
-    text_vector = vectorizer.transform([processed_text])
-    
-    # Get prediction
-    prediction = model.predict(text_vector)[0]
-    
-    # Get probability scores
-    proba = model.predict_proba(text_vector)[0]
-    confidence = max(proba) * 100
-    
-    # Determine if the SMS is safe
-    is_safe = prediction == 0
-    
-    # Generate analysis
-    if is_safe:
-        analysis = "This SMS appears to be legitimate and safe."
-        threats = []
-    else:
-        analysis = "This SMS shows characteristics of spam or malicious content."
-        threats = [
-            "Potential spam content",
-            "Suspicious patterns detected",
-            "High risk of phishing attempt"
-        ]
-    
-    return {
-        "is_safe": is_safe,
-        "confidence": confidence,
-        "analysis": analysis,
-        "threats": threats
-    }
+    if model is None or vectorizer is None:
+        raise HTTPException(status_code=500, detail="Model not loaded")
+        
+    try:
+        # Preprocess the text
+        processed_text = preprocess_sms(text)
+        
+        # Vectorize the text
+        text_vector = vectorizer.transform([processed_text])
+        
+        # Get prediction
+        prediction = model.predict(text_vector)[0]
+        
+        # Get probability scores
+        proba = model.predict_proba(text_vector)[0]
+        confidence = max(proba) * 100
+        
+        # Determine if the SMS is safe (0 is safe, 1 is spam)
+        is_safe = prediction == 0
+        
+        # Generate analysis
+        if is_safe:
+            analysis = "This SMS appears to be legitimate and safe."
+            threats = []
+        else:
+            analysis = "This SMS shows characteristics of spam or malicious content."
+            threats = [
+                "Potential spam content",
+                "Suspicious patterns detected",
+                "High risk of phishing attempt"
+            ]
+        
+        return {
+            "is_safe": is_safe,
+            "confidence": confidence,
+            "analysis": analysis,
+            "threats": threats
+        }
+    except Exception as e:
+        logger.error(f"Error in analyze_sms_content: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/analyze-email", response_model=EmailResponse)
 async def analyze_email_endpoint(request: EmailRequest):
-    """
-    Analyze email content for security threats
-    """
     try:
-        logger.info(f"Received email analysis request. Content length: {len(request.content)}")
-        
-        if not request.content:
-            logger.error("Empty email content received")
-            raise HTTPException(status_code=400, detail="Email content cannot be empty")
-            
-        if model is None or vectorizer is None:
-            logger.error("Model or vectorizer not loaded")
-            raise HTTPException(status_code=500, detail="Model not loaded")
-            
-        logger.info("Starting email analysis...")
         result = analyze_email(request.content)
-        logger.info(f"Analysis complete. Result: {result}")
-        
-        return EmailResponse(**result)
-    except Exception as e:
-        logger.error(f"Error in analyze_email_endpoint: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/analyze-sms")
-async def analyze_sms(request: SMSRequest):
-    if not request.content:
-        raise HTTPException(status_code=400, detail="SMS content is required")
-    
-    if not model or not vectorizer:
-        raise HTTPException(status_code=500, detail="Model not loaded")
-    
-    try:
-        result = analyze_sms_content(request.content)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/analyze-sms")
+async def analyze_sms(request: SMSRequest):
+    if model is None or vectorizer is None:
+        raise HTTPException(status_code=500, detail="Model not loaded. Please check server logs.")
+    
+    try:
+        # Preprocess the text
+        text = request.content.lower()
+        text = re.sub(r'[^\w\s]', '', text)
+        
+        # Transform the text
+        text_vector = vectorizer.transform([text])
+        
+        # Get prediction
+        prediction = model.predict(text_vector)[0]
+        prediction_proba = model.predict_proba(text_vector)[0]
+        
+        # Convert numpy types to Python native types
+        is_safe = bool(prediction)
+        confidence = float(prediction_proba[1] * 100)
+        
+        # Determine analysis message
+        if is_safe:
+            analysis = "This SMS appears to be legitimate and safe."
+            threats = []
+        else:
+            analysis = "This SMS appears to be suspicious or potentially harmful."
+            threats = ["Potential spam or scam content detected"]
+        
+        return {
+            "is_safe": is_safe,
+            "confidence": confidence,
+            "analysis": analysis,
+            "threats": threats
+        }
+    except Exception as e:
+        logger.error(f"Error analyzing SMS: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/health")
 async def health_check():
-    """
-    Health check endpoint
-    """
-    return {
-        "status": "healthy",
-        "model_loaded": model is not None,
-        "vectorizer_loaded": vectorizer is not None,
-        "data_path": DATA_DIR,
-        "model_path": MODEL_DIR,
-        "dataset_path": DATASET_DIR,
-        "training_data_file": TRAINING_DATA_FILE,
-        "analysis_data_file": DATASET_FILE
-    }
+    return {"status": "healthy"}
 
 @app.post("/api/reviews")
 async def create_review(review: ReviewRequest):
-    try:
-        review_data = review.dict()
-        review_data["created_at"] = datetime.now()
-        logger.info(f"Attempting to insert review: {review_data}")
-        result = await reviews_collection.insert_one(review_data)
-        logger.info(f"Review inserted with ID: {result.inserted_id}")
-
-        created_review = await reviews_collection.find_one({"_id": result.inserted_id})
-        if created_review:
-            created_review["id"] = str(created_review["_id"])
-            logger.info(f"Successfully retrieved and formatted review: {created_review}")
-            return ReviewResponse(**created_review)
-        else:
-            logger.error("Failed to find created review after insertion.")
-            raise HTTPException(status_code=500, detail="Failed to retrieve created review.")
-    except Exception as e:
-        logger.error(f"Error creating review: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+    review_dict = review.dict()
+    review_dict["created_at"] = datetime.utcnow()
+    result = await reviews_collection.insert_one(review_dict)
+    return {
+        "id": str(result.inserted_id),
+        "name": review_dict["name"],
+        "rating": review_dict["rating"],
+        "comment": review_dict["comment"],
+        "created_at": review_dict["created_at"]
+    }
 
 @app.get("/api/reviews", response_model=List[ReviewResponse])
 async def get_reviews():
     reviews = []
-    try:
-        logger.info("Attempting to fetch all reviews.")
-        cursor = reviews_collection.find().sort("created_at", -1)
-        async for review in cursor:
-            review["id"] = str(review["_id"])
-            reviews.append(ReviewResponse(**review))
-        logger.info(f"Successfully fetched {len(reviews)} reviews.")
-        return reviews
-    except Exception as e:
-        logger.error(f"Error fetching reviews: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+    cursor = reviews_collection.find().sort("created_at", -1)
+    async for document in cursor:
+        document["id"] = str(document.pop("_id"))
+        reviews.append(document)
+    return reviews
 
 @app.get("/api/reviews/latest")
 async def get_latest_reviews():

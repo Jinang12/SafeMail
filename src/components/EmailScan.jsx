@@ -1,6 +1,4 @@
 import { useState } from 'react';
-
-// Use your computer's IP address instead of localhost
 const API_URL = 'http://192.168.29.227:8000/api';
 
 export default function SMSScan() {
